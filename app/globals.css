@@ -91,3 +91,19 @@ table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:6px;bord
 /* mobile & motion */
 @media(max-width:700px){.hero{grid-template-columns:1fr;padding-top:24px}.orb{max-width:220px;order:-1}.pills{display:none}.big{flex-basis:78vw}.mini{flex-basis:44vw}.filters{grid-template-columns:1fr 1fr}.chk{grid-column:1/-1}.rh h2{font-size:1.7rem}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+/* logo pokeball, drag scroll, view all */
+.ball{flex:none;animation:sp 8s linear infinite}
+.strip{cursor:grab;user-select:none;-webkit-user-select:none}
+.strip.drag{cursor:grabbing;scroll-snap-type:none}
+.arr{display:flex;align-items:center}
+.arr .va{width:auto;height:44px;border-radius:99px;padding:0 18px;font:inherit;font-weight:700;margin:0 8px 0 0}
+.vsheet{max-width:920px}
+.vh{margin:34px 0 10px;letter-spacing:-.03em}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;max-height:62vh;overflow:auto;margin-top:12px;padding:4px}
+.vc{border:2px solid var(--ink);border-radius:14px;overflow:hidden;background:#fff;cursor:pointer;transition:transform .15s}
+.vc:hover{transform:translateY(-3px)}.vc .thumb{aspect-ratio:1}
+.vc p{margin:6px 8px 0;font-weight:700;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vc small{display:block;margin:0 8px 8px;font-size:.78rem}
+.vc.sold .thumb{filter:grayscale(1);opacity:.6}
+.stamp.sm{font-size:1rem;top:40%}
+@media(max-width:700px){.vgrid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}.arr .va{padding:0 12px}}
