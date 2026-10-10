@@ -23,8 +23,9 @@ select,input[type=text],input:not([type]),input[type=number],textarea,input[type
 .hero h1{font-size:clamp(2.4rem,6vw,4.6rem);line-height:.98;letter-spacing:-.045em;margin-bottom:16px}
 .hero p{font-size:1.15rem;color:var(--mut);max-width:34ch;margin:0 0 22px}
 .chip{display:inline-block;background:var(--ink);color:#fff;border-radius:99px;padding:9px 18px;font-weight:700}
-.orb{aspect-ratio:1;width:100%;max-width:340px;justify-self:center;border-radius:50%;background:radial-gradient(circle at 30% 28%,#fff9,transparent 35%),conic-gradient(from 200deg,var(--vio),var(--cor),var(--sun),var(--mint),var(--vio));box-shadow:0 30px 80px #6c3cff55,inset 0 0 0 14px #ffffff55;animation:bob 6s ease-in-out infinite alternate}
-@keyframes bob{to{transform:translateY(-16px) rotate(8deg)}}
+.orb{position:relative;aspect-ratio:1;width:100%;max-width:340px;justify-self:center;border-radius:50%;border:12px solid var(--ink);background:linear-gradient(var(--cor) 0 calc(50% - 12px),var(--ink) calc(50% - 12px) calc(50% + 12px),#fff calc(50% + 12px));box-shadow:0 0 80px #ff4d6d66;animation:spin 10s linear infinite}
+.orb::before{content:'';position:absolute;left:50%;top:50%;width:32%;height:32%;margin:-16% 0 0 -16%;border-radius:50%;background:#fff;border:12px solid var(--ink)}
+.orb::after{content:'';position:absolute;left:50%;top:50%;width:13%;height:13%;margin:-6.5% 0 0 -6.5%;border-radius:50%;background:#fff;border:4px solid #d5dae6}
 .tick{overflow:hidden;border-block:2px solid var(--ink);background:var(--sun);margin:0 -24px;transform:rotate(-1deg)}
 .tick div{display:flex;gap:36px;white-space:nowrap;padding:11px 0;width:max-content;font-weight:800;font-size:1.1rem;animation:mq 30s linear infinite}
 @keyframes mq{to{transform:translateX(-50%)}}
