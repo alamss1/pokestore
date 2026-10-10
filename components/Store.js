@@ -55,7 +55,27 @@ export default function Store({items,settings,country}){
       <span className="lang"><button className={lang==='en'?'on':''} onClick={()=>chg('en')}>EN</button><button className={lang==='id'?'on':''} onClick={()=>chg('id')}>ID</button></span>
       <select value={cur} onChange={e=>setCur(e.target.value)} aria-label="Currency">{Object.keys(RATES).map(c=><option key={c}>{c}</option>)}</select>
     </nav>
-    <header className="hero"><div><h1>{t.h1}</h1><p>{t.sub}</p><span className="chip">{n} {t.left}</span></div><div className="orb"/></header>
+    <header className="hero">
+      <div><h1>{t.h1}</h1><p>{t.sub}</p><span className="chip">{n} {t.left}</span></div>
+      <div className="orb" aria-hidden>
+        <svg className="spin" viewBox="0 0 200 200">
+          <defs>
+            <radialGradient id="pr" cx="35%" cy="28%" r="80%"><stop offset="0" stopColor="#ff7a85"/><stop offset=".55" stopColor="#ef233c"/><stop offset="1" stopColor="#a4101f"/></radialGradient>
+            <radialGradient id="pw" cx="35%" cy="70%" r="85%"><stop offset="0" stopColor="#ffffff"/><stop offset=".7" stopColor="#eef0f6"/><stop offset="1" stopColor="#c3c9d8"/></radialGradient>
+            <clipPath id="pc"><circle cx="100" cy="100" r="94"/></clipPath>
+          </defs>
+          <g clipPath="url(#pc)"><rect width="200" height="100" fill="url(#pr)"/><rect y="100" width="200" height="100" fill="url(#pw)"/></g>
+          <rect x="6" y="92" width="188" height="16" fill="#1b1f2e" clipPath="url(#pc)"/>
+          <circle cx="100" cy="100" r="94" fill="none" stroke="#1b1f2e" strokeWidth="8"/>
+          <circle cx="100" cy="100" r="30" fill="#1b1f2e"/>
+          <circle cx="100" cy="100" r="21" fill="url(#pw)"/>
+          <circle cx="100" cy="100" r="12" fill="#ffffff" stroke="#c3c9d8" strokeWidth="3"/>
+        </svg>
+        <svg className="gloss" viewBox="0 0 200 200">
+          <ellipse cx="68" cy="52" rx="34" ry="17" fill="#ffffff" opacity=".4" transform="rotate(-35 68 52)"/>
+        </svg>
+      </div>
+    </header>
     <div className="tick"><div>{tk}</div></div>
     <div className="filters">
       <input placeholder={t.search} value={q} onChange={e=>setQ(e.target.value)}/>
