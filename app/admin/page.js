@@ -13,10 +13,13 @@ export default function Admin(){
   const login=()=>J('/api/login','POST',{password:pw}).then(load).catch(()=>alert('Password salah'));
   const save=async()=>{ await J('/api/items','POST',f); setF(null); load(); };
   const del=async id=>{ if(confirm('Hapus item ini?')){ await J('/api/items?id='+id,'DELETE'); load(); } };
-  const up=async e=>{
+    const up=async e=>{
     const files=[...e.target.files]; const urls=[];
-    for(const file of files){ setBusy(`Mengunggah ${file.name}...`); const b=await upload(file.name,file,{access:'public',handleUploadUrl:'/api/upload'}); urls.push(b.url); }
-    setBusy(''); setF(x=>({...x,media:[...x.media,...urls]}));
+    try{
+      for(const file of files){ setBusy(`Mengunggah ${file.name}...`); const b=await upload(file.name,file,{access:'public',handleUploadUrl:'/api/upload',multipart:true}); urls.push(b.url); }
+      setF(x=>({...x,media:[...x.media,...urls]}));
+    }catch(err){ alert('Upload gagal: '+(err?.message||err)); }
+    setBusy('');
   };
   const mv=(i,d)=>setF(x=>{const m=[...x.media];const j=i+d;if(j<0||j>=m.length)return x;[m[i],m[j]]=[m[j],m[i]];return {...x,media:m}});
   const t=(k,v)=>setF(x=>({...x,[k]:v})), td=(k,v)=>setF(x=>({...x,details:{...x.details,[k]:v}}));
