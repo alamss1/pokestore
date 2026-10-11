@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { upload } from '@vercel/blob/client';
 const J = (url,method='GET',body)=>fetch(url,{method,headers:{'Content-Type':'application/json'},body:body&&JSON.stringify(body)}).then(r=>r.ok?r.json():Promise.reject(r.status));
-const EMPTY = { type:'each', title:'', ptype:'', price:0, oldPrice:0, stock:1, status:'available', published:false, featured:false, index:1, badge:'', notes:'', media:[], details:{level:'',team:'',pokemon:'',shiny:'',legendary:'',login:'',tahun:''} };
+const EMPTY = { type:'each', title:'', ptype:'', price:0, oldPrice:0, stock:1, status:'available', published:false, featured:false, index:1, badge:'', notes:'', media:[], fx:50, fy:50, fz:1, details:{level:'',team:'',pokemon:'',shiny:'',legendary:'',login:'',tahun:''} };
 const isVid = u=>/\.(mp4|webm|mov|m4v)(\?|$)/i.test(u);
 
 export default function Admin(){
@@ -24,6 +24,8 @@ export default function Admin(){
   const mv=(i,d)=>setF(x=>{const m=[...x.media];const j=i+d;if(j<0||j>=m.length)return x;[m[i],m[j]]=[m[j],m[i]];return {...x,media:m}});
   const t=(k,v)=>setF(x=>({...x,[k]:v})), td=(k,v)=>setF(x=>({...x,details:{...x.details,[k]:v}}));
   const name=id=>items.find(i=>i.id===id)?.title||id;
+  const pos=e=>{const r=e.currentTarget.getBoundingClientRect();setF(x=>({...x,fx:Math.round((e.clientX-r.left)/r.width*100),fy:Math.round((e.clientY-r.top)/r.height*100)}))};
+  const fx=f?.fx??50, fy=f?.fy??50, fz=f?.fz||1;
 
   if(auth===null) return <main>Memuat...</main>;
   if(!auth) return <main className="adm" style={{maxWidth:340}}><h1>Admin</h1><input type="password" placeholder="Password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==='Enter'&&login()}/><button className="btn" onClick={login}>Masuk</button></main>;
@@ -54,6 +56,16 @@ export default function Admin(){
       <label>Nomor index (urutan tampil, kecil = atas)<input type="number" value={f.index} onChange={e=>t('index',+e.target.value)}/></label>
       <label>Foto / video (boleh banyak)<input type="file" accept="image/*,video/*" multiple onChange={up}/></label>{busy&&<small>{busy}</small>}
       {f.media.map((u,i)=><div className="li" key={u}>{isVid(u)?<video src={u} muted/>:<img src={u} alt=""/>}<span>Media {i+1}{i===0?' (gambar utama)':''}</span><button className="x" onClick={()=>mv(i,-1)}>Naik</button><button className="x" onClick={()=>mv(i,1)}>Turun</button><button className="x" onClick={()=>t('media',f.media.filter(m=>m!==u))}>Hapus</button></div>)}
+      {f.type!=='testi' && f.media[0] && !isVid(f.media[0]) && <div className="fp">
+        <small>Pilih area yang ingin ditonjolkan. Klik pada gambar, gambar aslinya tidak dipotong.</small>
+        <div className="fpw">
+          <img src={f.media[0]} alt="" onClick={pos}/>
+          <i style={{left:fx+'%',top:fy+'%'}}/>
+        </div>
+        <label>Zoom {fz}x<input type="range" min="1" max="3" step="0.1" value={fz} onChange={e=>t('fz',+e.target.value)}/></label>
+        <small>Pratinjau di kartu:</small>
+        <div className="pv"><img src={f.media[0]} alt="" style={{objectPosition:`${fx}% ${fy}%`,transformOrigin:`${fx}% ${fy}%`,transform:`scale(${fz})`}}/></div>
+      </div>}
       {f.type!=='testi' && <label><span><input type="checkbox" checked={!!f.featured} onChange={e=>t('featured',e.target.checked)}/> Unggulan (tampil di jendela depan)</span></label>}
       <label><span><input type="checkbox" checked={f.published} onChange={e=>t('published',e.target.checked)}/> Tayangkan (kalau tidak dicentang, jadi draft)</span></label>
       <div className="two"><button className="btn" onClick={save} disabled={!!busy}>Simpan</button><button className="x" onClick={()=>setF(null)}>Batal</button></div>
