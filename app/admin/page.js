@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { upload } from '@vercel/blob/client';
 const J = (url,method='GET',body)=>fetch(url,{method,headers:{'Content-Type':'application/json'},body:body&&JSON.stringify(body)}).then(r=>r.ok?r.json():Promise.reject(r.status));
-const EMPTY = { type:'each', title:'', ptype:'', price:0, oldPrice:0, stock:1, status:'available', published:false, index:1, badge:'', notes:'', media:[], details:{level:'',team:'',pokemon:'',shiny:'',legendary:'',login:'',tahun:''} };
+const EMPTY = { type:'each', title:'', ptype:'', price:0, oldPrice:0, stock:1, status:'available', published:false, featured:false, index:1, badge:'', notes:'', media:[], details:{level:'',team:'',pokemon:'',shiny:'',legendary:'',login:'',tahun:''} };
 const isVid = u=>/\.(mp4|webm|mov|m4v)(\?|$)/i.test(u);
 
 export default function Admin(){
@@ -13,7 +13,7 @@ export default function Admin(){
   const login=()=>J('/api/login','POST',{password:pw}).then(load).catch(()=>alert('Password salah'));
   const save=async()=>{ await J('/api/items','POST',f); setF(null); load(); };
   const del=async id=>{ if(confirm('Hapus item ini?')){ await J('/api/items?id='+id,'DELETE'); load(); } };
-    const up=async e=>{
+  const up=async e=>{
     const files=[...e.target.files]; const urls=[];
     try{
       for(const file of files){ setBusy(`Mengunggah ${file.name}...`); const b=await upload(file.name,file,{access:'public',handleUploadUrl:'/api/upload',multipart:true}); urls.push(b.url); }
@@ -36,12 +36,12 @@ export default function Admin(){
       <button className="btn" onClick={()=>setF({...EMPTY,index:items.length+1})}>Tambah item</button><br/><br/>
       {items.map(i=><div className="li" key={i.id}>
         {i.media?.[0]&&(isVid(i.media[0])?<video src={i.media[0]} muted/>:<img src={i.media[0]} alt=""/>)}
-        <span><b>{i.title}</b><br/><small>{i.type} · #{i.index} · {i.status} · Rp{i.price} {i.published?'':'· DRAFT'}</small></span>
-        <button className="btn" onClick={()=>setF(i)}>Edit</button><button className="x" onClick={()=>del(i.id)}>Hapus</button></div>)}
+        <span><b>{i.title}</b>{i.featured?' ★':''}<br/><small>{i.type} · #{i.index} · {i.status} · Rp{i.price} {i.published?'':'· DRAFT'}</small></span>
+        <button className="btn" onClick={()=>setF({...EMPTY,...i,details:{...EMPTY.details,...(i.details||{})}})}>Edit</button><button className="x" onClick={()=>del(i.id)}>Hapus</button></div>)}
     </>}
 
     {tab==='items' && f && <div className="adm">
-      <label>Jenis<select value={f.type} onChange={e=>t('type',e.target.value)}><option value="each">Each (Pokémon satuan)</option><option value="account">Take Account</option><option value="testi">Testimoni</option></select></label>
+      <label>Jenis<select value={f.type} onChange={e=>t('type',e.target.value)}><option value="each">Each (Pokémon satuan)</option><option value="account">Account</option><option value="testi">Testimoni</option></select></label>
       {f.type!=='testi' && <>
         <label>Nama<input value={f.title} onChange={e=>t('title',e.target.value)}/></label>
         {f.type==='each' && <label>Jenis Pokémon (Fire, Water, ...)<input value={f.ptype} onChange={e=>t('ptype',e.target.value)}/></label>}
@@ -49,11 +49,12 @@ export default function Admin(){
         <div className="two"><label>Stok<input type="number" value={f.stock} onChange={e=>t('stock',+e.target.value)}/></label><label>Badge (NEW/HOT/DISKON)<input value={f.badge} onChange={e=>t('badge',e.target.value)}/></label></div>
         <label>Status<select value={f.status} onChange={e=>t('status',e.target.value)}><option value="available">Available</option><option value="booked">Booked</option><option value="sold">Sold</option></select></label>
       </>}
-      {f.type==='account' && <div className="two">{Object.keys(f.details||EMPTY.details).map(k=><label key={k}>{k}<input value={f.details[k]||''} onChange={e=>td(k,e.target.value)}/></label>)}</div>}
-      {f.type!=='testi' && <label>Catatan<textarea rows={3} value={f.notes} onChange={e=>t('notes',e.target.value)}/></label>}
+      {f.type==='account' && <div className="two">{Object.keys(EMPTY.details).map(k=><label key={k}>{k}<input value={f.details[k]||''} onChange={e=>td(k,e.target.value)}/></label>)}</div>}
+      {f.type!=='testi' && <label>Deskripsi / catatan (tampil setelah item diklik)<textarea rows={4} value={f.notes} onChange={e=>t('notes',e.target.value)}/></label>}
       <label>Nomor index (urutan tampil, kecil = atas)<input type="number" value={f.index} onChange={e=>t('index',+e.target.value)}/></label>
       <label>Foto / video (boleh banyak)<input type="file" accept="image/*,video/*" multiple onChange={up}/></label>{busy&&<small>{busy}</small>}
-      {f.media.map((u,i)=><div className="li" key={u}>{isVid(u)?<video src={u} muted/>:<img src={u} alt=""/>}<span>Media {i+1}</span><button className="x" onClick={()=>mv(i,-1)}>Naik</button><button className="x" onClick={()=>mv(i,1)}>Turun</button><button className="x" onClick={()=>t('media',f.media.filter(m=>m!==u))}>Hapus</button></div>)}
+      {f.media.map((u,i)=><div className="li" key={u}>{isVid(u)?<video src={u} muted/>:<img src={u} alt=""/>}<span>Media {i+1}{i===0?' (gambar utama)':''}</span><button className="x" onClick={()=>mv(i,-1)}>Naik</button><button className="x" onClick={()=>mv(i,1)}>Turun</button><button className="x" onClick={()=>t('media',f.media.filter(m=>m!==u))}>Hapus</button></div>)}
+      {f.type!=='testi' && <label><span><input type="checkbox" checked={!!f.featured} onChange={e=>t('featured',e.target.checked)}/> Unggulan (tampil di jendela depan)</span></label>}
       <label><span><input type="checkbox" checked={f.published} onChange={e=>t('published',e.target.checked)}/> Tayangkan (kalau tidak dicentang, jadi draft)</span></label>
       <div className="two"><button className="btn" onClick={save} disabled={!!busy}>Simpan</button><button className="x" onClick={()=>setF(null)}>Batal</button></div>
     </div>}
